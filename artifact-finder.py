@@ -1,5 +1,8 @@
 import requests
 import pandas as pd
+import os
+import sqlalchemy
+from sqlalchemy import create_engine
 
 location = input("Add a city: ")
 startYear = input('Add start year: ')
@@ -15,13 +18,11 @@ df = pd.DataFrame(columns=cols)
 database_name = 'museum_objects'
 
 for id in j['objectIDs']:
-    obj = requests.get('https://collectionapi.metmuseum.org/public/collection/v1/objects/'+ str(id))
+    response = requests.get('https://collectionapi.metmuseum.org/public/collection/v1/objects/'+ str(id))
+    obj = response.json()
     df.loc[len(df.index)] = [obj['title'], obj['objectName'], obj['artistDisplayName'], obj['period']]
 
     
-# os.system('mysql -u root -pcodio -e "CREATE DATABASE IF NOT EXISTS '+ database_name +';"')
-
-
-# engine = 'mysql://root:codio@localhost/' + database_name
-# df.to_sql('objects', con=engine, if_exists='append', index=False)
-# test 1
+os.system('mysql -u root -pcodio -e "CREATE DATABASE IF NOT EXISTS '+ database_name +';"')
+engine = 'mysql://root:codio@localhost/' + database_name
+df.to_sql('objects', con=engine, if_exists='append', index=False)
