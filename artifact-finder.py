@@ -16,7 +16,7 @@ database_name = 'museum_objects'
 
 for id in j['objectIDs']:
     obj = requests.get('https://collectionapi.metmuseum.org/public/collection/v1/objects/'+ str(id))
-    # df.loc[len(df.index)] = [obj['title'], obj['objectName'], obj['artistDisplayName'], obj['period']]
+    df.loc[len(df.index)] = [obj['title'], obj['objectName'], obj['artistDisplayName'], obj['period']]
 
     
 # os.system('mysql -u root -pcodio -e "CREATE DATABASE IF NOT EXISTS '+ database_name +';"')
