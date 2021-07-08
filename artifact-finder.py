@@ -15,9 +15,17 @@ file_name = 'museumdata.sql'
 
 
 def convertToJson(location, startYear, endYear):
+    if startYear > endYear:
+        endYear = input('Please enter a year greater than start year: ')
     r = requests.get(baseUrl + 'search?dateBegin=' + startYear
                      + '&dateEnd=' + endYear + '&q=' + location)
     return r.json()
+
+def emptylist(results):
+    if results['total'] == 0:
+        return False
+    else:
+        return True
 
 
 def convertToDataFrame(cols):
@@ -52,5 +60,5 @@ convertToDataFrame(cols)
 df = convertToDataFrame(cols)
 df = getObjInfo(j, df)
 createDB(database_name)
-convertToSQL(table_name, df, database_name)
+convertToSQL(location, df, database_name)
 saveSQLtoFile(database_name, file_name)
