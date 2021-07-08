@@ -12,16 +12,18 @@ file_name = 'museumdata.sql'
 
 def museumRequest(location, startYear, endYear):
     if startYear > endYear:
-        endYear = input('Please enter a year greater than start year: ')
-    r = requests.get(baseUrl + 'search?dateBegin=' + startYear
-                     + '&dateEnd=' + endYear + '&q=' + location)
-    return r.json()
-
-def emptylist(results):
-    if results['total'] == 0:
-        return False
+        newEndYear = input('Please enter a year greater than start year entered ('
+                        + startYear + '): ')
+        museumRequest(location, startYear, newEndYear)
     else:
-        return True
+        r = requests.get(baseUrl + 'search?dateBegin=' + startYear
+                     + '&dateEnd=' + endYear + '&q=' + location)
+        if r.json()['total'] == 0:
+            laterYear = input('No objects for that timeframe, please enter a later end year: ')
+            museumRequest(location, startYear, laterYear)
+        else:
+            return r.json()
+
 
 def convertToDataFrame(cols):
     df = pd.DataFrame(columns=cols)
@@ -57,10 +59,10 @@ def main():
     print(j['total'])
     convertToDataFrame(cols)
     df = convertToDataFrame(cols)
-    df = getObjInfo(j, df)
+    obj_df = getObjInfo(j, df)
     createDB(database_name)
-    # convertToSQL(location, df, database_name)
-    # saveSQLtoFile(database_name, file_name)
+    convertToSQL(location, obj_df, database_name)
+    saveSQLtoFile(database_name, file_name)
 
 if __name__ == "__main__":
     main()
