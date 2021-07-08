@@ -41,7 +41,7 @@ def createDB(database_name):
 
 
 def convertToSQL(table_name, df, database_name):
-    engine = 'mysql://root:codio@localhost/' + database_name
+    engine = create_engine('mysql://root:codio@localhost/' + database_name +'?charset=utf8', encoding='utf-8')
     df.to_sql(table_name, con=engine, if_exists='append', index=False)
 
 
@@ -59,8 +59,8 @@ def main():
     df = convertToDataFrame(cols)
     df = getObjInfo(j, df)
     createDB(database_name)
-    # convertToSQL(location, df, database_name)
-    # saveSQLtoFile(database_name, file_name)
+    convertToSQL(table_name, df, database_name)
+    saveSQLtoFile(database_name, file_name)
 
 if __name__ == "__main__":
     main()
