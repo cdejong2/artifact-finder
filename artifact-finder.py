@@ -27,20 +27,6 @@ def emptylist(results):
     else:
         return True
 
-
-<<<<<<< HEAD
-for id in j['objectIDs']:
-    response = requests.get('https://collectionapi.metmuseum.org/public/collection/v1/objects/'+ str(id))
-    obj = response.json()
-    df.loc[len(df.index)] = [obj['title'], obj['objectName'], obj['artistDisplayName'], obj['period']]
-
-    
-os.system('mysql -u root -pcodio -e "CREATE DATABASE IF NOT EXISTS '+ database_name +';"')
-engine = 'mysql://root:codio@localhost/' + database_name
-df.to_sql('objects', con=engine, if_exists='append', index=False)
-
-# branch test
-=======
 def convertToDataFrame(cols):
     df = pd.DataFrame(columns=cols)
     return df
@@ -75,4 +61,4 @@ df = getObjInfo(j, df)
 createDB(database_name)
 convertToSQL(location, df, database_name)
 saveSQLtoFile(database_name, file_name)
->>>>>>> 196f20c1837fb0a0f7557dda2b935e4ffd509da9
+
