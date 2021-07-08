@@ -41,7 +41,8 @@ def createDB(database_name):
 
 
 def convertToSQL(table_name, df, database_name):
-    engine = create_engine('mysql://root:codio@localhost/' + database_name +'?charset=utf8', encoding='utf-8')
+    engine = create_engine('mysql://root:codio@localhost/' + database_name
+                           +'?charset=utf8', encoding='utf-8')
     df.to_sql(table_name, con=engine, if_exists='append', index=False)
 
 
