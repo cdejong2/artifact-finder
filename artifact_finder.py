@@ -4,17 +4,13 @@ import os
 import sqlalchemy
 from sqlalchemy import create_engine
 
-location = input("Add a city: ")
-startYear = input('Add start year: ')
-endYear = input('Add end year: ')
 baseUrl = 'https://collectionapi.metmuseum.org/public/collection/v1/'
 cols = ['title', 'objectName', 'artistDisplayName', 'period']
 database_name = 'museum_objects'
 table_name = 'objects'
 file_name = 'museumdata.sql'
 
-
-def convertToJson(location, startYear, endYear):
+def museumRequest(location, startYear, endYear):
     if startYear > endYear:
         endYear = input('Please enter a year greater than start year: ')
     r = requests.get(baseUrl + 'search?dateBegin=' + startYear
@@ -52,13 +48,21 @@ def convertToSQL(table_name, df, database_name):
 def saveSQLtoFile(database_name, file_name):
     os.system('mysqldump -u root -pcodio '+ database_name +' > ' + file_name)
 
+def main():
+    location = input("Add a city: ")
+    startYear = input('Add start year: ')
+    endYear = input('Add end year: ')
 
-j = convertToJson(location, startYear, endYear)
-print(j['total'])
-convertToDataFrame(cols)
-df = convertToDataFrame(cols)
-df = getObjInfo(j, df)
-createDB(database_name)
-convertToSQL(location, df, database_name)
-saveSQLtoFile(database_name, file_name)
+    j = museumRequest(location, startYear, endYear)
+    print(j['total'])
+    convertToDataFrame(cols)
+    df = convertToDataFrame(cols)
+    df = getObjInfo(j, df)
+    createDB(database_name)
+    # convertToSQL(location, df, database_name)
+    # saveSQLtoFile(database_name, file_name)
+
+if __name__ == "__main__":
+    main()
+
 
