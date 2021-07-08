@@ -1,15 +1,16 @@
 import unittest
-from artifact-finder import convertToJson, convertToDataFrame
+import requests
+from artifact_finder import museumRequest, convertToDataFrame
 # , getObjInfo
 
 
 class TestFileName(unittest.TestCase):
-    def test_convertToJson(self):
+    def test_museumRequest(self):
         r = requests.get('https://collectionapi.metmuseum.org/public/collection/v1/search?dateBegin=1900&dateEnd=1910&q=boston')
         j = r.json
-        self.assertEqual(convertToJson(boston, 1900, 1910),j)
-        self.assertNotEqual(convertToJson(boston, 1900, 1910), 0)
-        self.assertEqual(convertToJson(boston, 1910, 1900), 0)
+        self.assertEqual(museumRequest('boston', '1900', '1910'), j)
+        self.assertNotEqual(museumRequest('boston', '1900', '1910'), 0)
+        self.assertEqual(museumRequest('boston', '1910', '1900'), 0)
 
 
     def test_convertToDataFrame(self):
