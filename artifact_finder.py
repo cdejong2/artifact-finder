@@ -10,19 +10,31 @@ database_name = 'museum_objects'
 table_name = 'objects'
 file_name = 'museumdata.sql'
 
+def validateInput():
+    loc = input("Add a city: ")
+    # valid years are 0 CE to 2021 CE (there are probably older objects in the collection)
+    start = int(input('Add start year: '))
+    if start > 2021 or start < 0:
+        print("Invalid start year, please try again")
+        loc, start, end = validateInput()
+    end = int(input('Add end year: '))
+    if end > 2021 or end < 0:
+        print("Invalid end year, please try again")
+        loc, start, end = validateInput()
+    if start > end:
+        print("Start year greater than end year, please try again")
+        loc, start, end = validateInput()
+    return loc, start, end
+
+
 def museumRequest(location, startYear, endYear):
-    if startYear > endYear:
-        newEndYear = input('Please enter a year greater than start year entered ('
-                        + startYear + '): ')
-        museumRequest(location, startYear, newEndYear)
-    else:
-        r = requests.get(baseUrl + 'search?dateBegin=' + startYear
-                     + '&dateEnd=' + endYear + '&q=' + location)
-        if r.json()['total'] == 0:
-            laterYear = input('No objects for that timeframe, please enter a later end year: ')
-            museumRequest(location, startYear, laterYear)
-        else:
-            return r.json()
+    response = requests.get(baseUrl + 'search?dateBegin=' + str(startYear)
+                 + '&dateEnd=' + str(endYear) + '&q=' + location)
+    if response.json()['total'] == 0:
+        print('No objects for that timeframe/location, please try again')
+        location, startYear, endYear = validateInput()
+        response = museumRequest(location, startYear, endYear)
+    return response
 
 
 def convertToDataFrame(cols):
@@ -51,15 +63,11 @@ def saveSQLtoFile(database_name, file_name):
     os.system('mysqldump -u root -pcodio '+ database_name +' > ' + file_name)
 
 def main():
-    location = input("Add a city: ")
-    startYear = input('Add start year: ')
-    endYear = input('Add end year: ')
-
+    location, startYear, endYear = validateInput()
     j = museumRequest(location, startYear, endYear)
-    print(j['total'])
-    convertToDataFrame(cols)
+    print(j.json()['total'])
     df = convertToDataFrame(cols)
-    obj_df = getObjInfo(j, df)
+    obj_df = getObjInfo(j.json(), df)
     createDB(database_name)
     convertToSQL(table_name, df, database_name)
     saveSQLtoFile(database_name, file_name)
