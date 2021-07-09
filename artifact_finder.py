@@ -49,6 +49,8 @@ def convertToSQL(table_name, df, database_name):
 def saveSQLtoFile(database_name, file_name):
     os.system('mysqldump -u root -pcodio '+ database_name +' > ' + file_name)
 
+    import plotly.express as px
+
 def main():
     location = input("Add a city: ")
     startYear = input('Add start year: ')
