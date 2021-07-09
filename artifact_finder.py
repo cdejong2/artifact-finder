@@ -3,7 +3,7 @@ import pandas as pd
 import os
 import sqlalchemy
 from sqlalchemy import create_engine
-import plotly.graph_objects as go  # import plotly
+import plotly.express as go  # import plotly
 
 baseUrl = 'https://collectionapi.metmuseum.org/public/collection/v1/'
 cols = ['title', 'objectName', 'artistDisplayName', 'period']
@@ -69,16 +69,19 @@ def saveSQLtoFile(database_name, file_name):
     os.system('mysqldump -u root -pcodio ' + database_name + ' > ' + file_name)
 
 
-def displayGraph(location, startYear, endYear, df):
+def displayGraph(location, startYear, endYear):
     total = []
     x = []
-    xl = range(int(startYear),int(endYear))
+    xl = range(int(startYear),int(endYear+1))
     for n in xl:
         response = requests.get(baseUrl + 'search?dateBegin=' + str(n)
                             + '&dateEnd=' + str(n) + '&q=' + location)
         x.append(n)
         total.append(response.json()['total'])
-    fig = go.Figure(data=go.Bar(x=x, y=total))
+
+    show_df = pd.DataFrame(dict(years= x, totalArtifacts= total))
+    print(show_df)
+    fig = go.bar(show_df, x=show_df.years, y=show_df.totalArtifacts)
     #, size="pop", color="location", hover_name="title"
     fig.write_html('artifactGraph.html') 
 
@@ -92,7 +95,7 @@ def main():
     createDB(database_name)
     convertToSQL(table_name, df, database_name)
     saveSQLtoFile(database_name, file_name)
-    displayGraph(loc, start, end, df)
+    displayGraph(loc, start, end)
 
 
 if __name__ == "__main__":
