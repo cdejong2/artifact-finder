@@ -10,6 +10,7 @@ class TestFileName(unittest.TestCase):
         j = r.json()
         self.assertEqual(museumRequest('boston', '1900', '1910'), j)
         self.assertNotEqual(museumRequest('boston', '1900', '1910'), 0)
+
     def test_convertToDataFrame(self):
         cols = ['title', 'objectName', 'artistDisplayName', 'period']
         df = pd.DataFrame(columns=cols)
