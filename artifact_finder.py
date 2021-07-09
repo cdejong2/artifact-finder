@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import sqlalchemy
 from sqlalchemy import create_engine
+import plotly.graph_objects as go  # import plotly
 
 baseUrl = 'https://collectionapi.metmuseum.org/public/collection/v1/'
 cols = ['title', 'objectName', 'artistDisplayName', 'period']
@@ -49,7 +50,15 @@ def convertToSQL(table_name, df, database_name):
 def saveSQLtoFile(database_name, file_name):
     os.system('mysqldump -u root -pcodio '+ database_name +' > ' + file_name)
 
-    import plotly.express as px
+def displayGraph(location, startYear, endYear, df):
+    total = []
+    x = range(int(startYear),int(endYear))
+    for n in x:
+        year = museumRequest(location, x, x)
+        total.append(year['total'])
+    fig = go.Figure(df, x="x", y="total")
+    #, size="pop", color="location", hover_name="title"
+    fig.write_html('artifactGraph.html') 
 
 def main():
     location = input("Add a city: ")
@@ -64,7 +73,8 @@ def main():
     createDB(database_name)
     convertToSQL(table_name, df, database_name)
     saveSQLtoFile(database_name, file_name)
-
+    displayGraph(location, startYear, endYear, df)
+    
 if __name__ == "__main__":
     main()
 
