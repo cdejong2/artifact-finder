@@ -6,7 +6,7 @@ from artifact_finder import museumRequest, convertToDataFrame
 
 class TestFileName(unittest.TestCase):
     def test_museumRequest(self):
-        r = requests.get('https://collectionapi.metmuseum.org/public/
+        r = requests.get('https://collectionapi.metmuseum.org/public/'
                          + 'collection/v1/search?'
                          + 'dateBegin=1900&dateEnd=1910&q=boston')
         self.assertEqual(museumRequest('boston', '1900', '1910'), r.json())
