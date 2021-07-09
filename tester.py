@@ -9,7 +9,8 @@ class TestFileName(unittest.TestCase):
         r = requests.get('https://collectionapi.metmuseum.org/public/'
                          + 'collection/v1/search?'
                          + 'dateBegin=1900&dateEnd=1910&q=boston')
-        self.assertEqual(museumRequest('boston', '1900', '1910').json(), r.json())
+        self.assertEqual(museumRequest('boston', '1900', '1910').json(),
+                         r.json())
         self.assertNotEqual(museumRequest('boston', '1900', '1910').json(), 0)
 
     def test_convertToDataFrame(self):
