@@ -3,6 +3,7 @@ import pandas as pd
 import os
 import sqlalchemy
 from sqlalchemy import create_engine
+import plotly.express as go  # import plotly
 
 baseUrl = 'https://collectionapi.metmuseum.org/public/collection/v1/'
 cols = ['title', 'objectName', 'artistDisplayName', 'period']
@@ -35,7 +36,7 @@ def museumRequest(location, startYear, endYear):
         print('No objects for that timeframe/location, please try again')
         location, startYear, endYear = validateInput()
         response = museumRequest(location, startYear, endYear)
-    return response
+    return response, location, startYear, endYear
 
 
 def convertToDataFrame(cols):
@@ -67,9 +68,26 @@ def saveSQLtoFile(database_name, file_name):
     os.system('mysqldump -u root -pcodio ' + database_name + ' > ' + file_name)
 
 
+def displayGraph(location, startYear, endYear):
+    total = []
+    x = []
+    xl = range(int(startYear),int(endYear+1))
+    for n in xl:
+        response = requests.get(baseUrl + 'search?dateBegin=' + str(n)
+                            + '&dateEnd=' + str(n) + '&q=' + location)
+        x.append(n)
+        total.append(response.json()['total'])
+
+    show_df = pd.DataFrame(dict(years= x, totalArtifacts= total))
+    print(show_df)
+    fig = go.bar(show_df, x=show_df.years, y=show_df.totalArtifacts)
+    #, size="pop", color="location", hover_name="title"
+    fig.write_html('artifactGraph.html') 
+
+
 def main():
     location, startYear, endYear = validateInput()
-    j = museumRequest(location, startYear, endYear)
+    j, loc, start, end = museumRequest(location, startYear, endYear)
     print(j.json()['total'])
     df = convertToDataFrame(cols)
     obj_df = getObjInfo(j.json(), df)
@@ -77,6 +95,7 @@ def main():
     createDB(database_name)
     convertToSQL(table_name, df, database_name)
     saveSQLtoFile(database_name, file_name)
+    displayGraph(loc, start, end)
 
 
 if __name__ == "__main__":
