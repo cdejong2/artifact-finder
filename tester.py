@@ -2,7 +2,6 @@ import unittest
 import requests
 import pandas as pd
 from artifact_finder import museumRequest, convertToDataFrame
-# , getObjInfo
 
 
 class TestFileName(unittest.TestCase):
@@ -11,13 +10,11 @@ class TestFileName(unittest.TestCase):
         j = r.json()
         self.assertEqual(museumRequest('boston', '1900', '1910'), j)
         self.assertNotEqual(museumRequest('boston', '1900', '1910'), 0)
-
-
     def test_convertToDataFrame(self):
         cols = ['title', 'objectName', 'artistDisplayName', 'period']
         df = pd.DataFrame(columns=cols)
         self.assertEqual(convertToDataFrame(cols).columns.empty, False)
-        self.assertEqual(convertToDataFrame([1,2,3]).columns.empty, False)
+        self.assertEqual(convertToDataFrame([1, 2, 3]).columns.empty, False)
 
 
 if __name__ == '__main__':

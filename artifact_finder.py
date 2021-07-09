@@ -10,9 +10,11 @@ database_name = 'museum_objects'
 table_name = 'objects'
 file_name = 'museumdata.sql'
 
+
 def validateInput():
     loc = input("Add a city: ")
-    # valid years are 0 CE to 2021 CE (there are probably older objects in the collection)
+    # valid years are 0 CE to 2021 CE - there are probably older 
+    # objects in the collection, chose a smaller range due to time constraints
     start = int(input('Add start year: '))
     if start > 2021 or start < 0:
         print("Invalid start year, please try again")
@@ -29,7 +31,7 @@ def validateInput():
 
 def museumRequest(location, startYear, endYear):
     response = requests.get(baseUrl + 'search?dateBegin=' + str(startYear)
-                 + '&dateEnd=' + str(endYear) + '&q=' + location)
+                            + '&dateEnd=' + str(endYear) + '&q=' + location)
     if response.json()['total'] == 0:
         print('No objects for that timeframe/location, please try again')
         location, startYear, endYear = validateInput()
@@ -55,7 +57,7 @@ def createDB(database_name):
 
 
 def convertToSQL(table_name, df, database_name):
-    engine = create_engine('mysql://root:codio@localhost/' + database_name +'?charset=utf8', encoding='utf-8')
+    engine = create_engine('mysql://root:codio@localhost/' + database_name + '?charset=utf8', encoding='utf-8')
     df.to_sql(table_name, con=engine, if_exists='append', index=False)
 
 
@@ -72,7 +74,6 @@ def main():
     convertToSQL(table_name, df, database_name)
     saveSQLtoFile(database_name, file_name)
 
+
 if __name__ == "__main__":
     main()
-
-
