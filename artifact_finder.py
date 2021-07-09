@@ -52,6 +52,7 @@ def getObjInfo(j, df):
                                  obj['artistDisplayName'], obj['period']]
     return df
 
+
 def createDB(database_name):
     os.system('mysql -u root -pcodio -e "CREATE DATABASE IF NOT EXISTS '
               + database_name + ';"')
@@ -65,6 +66,7 @@ def convertToSQL(table_name, df, database_name):
 
 def saveSQLtoFile(database_name, file_name):
     os.system('mysqldump -u root -pcodio ' + database_name + ' > ' + file_name)
+
 
 def main():
     location, startYear, endYear = validateInput()
