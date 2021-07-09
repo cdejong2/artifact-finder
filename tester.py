@@ -6,10 +6,10 @@ from artifact_finder import museumRequest, convertToDataFrame
 
 class TestFileName(unittest.TestCase):
     def test_museumRequest(self):
-        r = requests.get('https://collectionapi.metmuseum.org/public/collection'
-                         + '/v1/search?dateBegin=1900&dateEnd=1910&q=boston')
-        j = r.json()
-        self.assertEqual(museumRequest('boston', '1900', '1910'), j)
+        r = requests.get('https://collectionapi.metmuseum.org/public/
+                         + 'collection/v1/search?'
+                         + 'dateBegin=1900&dateEnd=1910&q=boston')
+        self.assertEqual(museumRequest('boston', '1900', '1910'), r.json())
         self.assertNotEqual(museumRequest('boston', '1900', '1910'), 0)
 
     def test_convertToDataFrame(self):
