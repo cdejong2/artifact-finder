@@ -7,7 +7,6 @@ from sqlalchemy import create_engine
 baseUrl = 'https://collectionapi.metmuseum.org/public/collection/v1/'
 cols = ['title', 'objectName', 'artistDisplayName', 'period']
 database_name = 'museum_objects'
-table_name = 'objects'
 file_name = 'museumdata.sql'
 
 
@@ -74,6 +73,7 @@ def main():
     print(j.json()['total'])
     df = convertToDataFrame(cols)
     obj_df = getObjInfo(j.json(), df)
+    table_name = location
     createDB(database_name)
     convertToSQL(table_name, df, database_name)
     saveSQLtoFile(database_name, file_name)
