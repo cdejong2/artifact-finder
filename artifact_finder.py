@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 import plotly.express as go  # import plotly
 
 baseUrl = 'https://collectionapi.metmuseum.org/public/collection/v1/'
-cols = ['title', 'objectName', 'artistDisplayName', 'period']
+cols = ['title', 'objectName', 'artistDisplayName', 'yearCompleted']
 database_name = 'museum_objects'
 file_name = 'museumdata.sql'
 
@@ -49,7 +49,7 @@ def getObjInfo(j, df):
         response = requests.get(baseUrl + 'objects/' + str(id))
         obj = response.json()
         df.loc[len(df.index)] = [obj['title'], obj['objectName'],
-                                 obj['artistDisplayName'], obj['period']]
+                                 obj['artistDisplayName'], obj['objectEndDate']]
     return df
 
 
@@ -61,41 +61,40 @@ def createDB(database_name):
 def convertToSQL(table_name, df, database_name):
     engine = create_engine('mysql://root:codio@localhost/' + database_name
                            + '?charset=utf8', encoding='utf-8')
-    df.to_sql(table_name, con=engine, if_exists='append', index=False)
+    df.to_sql(table_name, con=engine, if_exists='replace', index=False)
 
 
 def saveSQLtoFile(database_name, file_name):
     os.system('mysqldump -u root -pcodio ' + database_name + ' > ' + file_name)
 
 
-def displayGraph(location, startYear, endYear):
+def displayGraph(location, startYear, endYear, df):
+    x = range(int(startYear),int(endYear+1))
+    x_years = []
     total = []
-    x = []
-    xl = range(int(startYear),int(endYear+1))
-    for n in xl:
-        response = requests.get(baseUrl + 'search?dateBegin=' + str(n)
-                            + '&dateEnd=' + str(n) + '&q=' + location)
-        x.append(n)
-        total.append(response.json()['total'])
-
-    show_df = pd.DataFrame(dict(years= x, totalArtifacts= total))
-    print(show_df)
-    fig = go.bar(show_df, x=show_df.years, y=show_df.totalArtifacts)
-    #, size="pop", color="location", hover_name="title"
+    for year in x:
+        count = 0
+        for object in df.yearCompleted:
+            if year == int(object):
+                count = count + 1
+        total.append(count)
+        x_years.append(year)
+    show_df = pd.DataFrame(dict(Years=x_years, TotalArtifacts=total))
+    fig = go.bar(show_df, x=show_df.Years, y=show_df.TotalArtifacts, title='Artifact Finder: ' + location)
     fig.write_html('artifactGraph.html') 
 
 
 def main():
     location, startYear, endYear = validateInput()
     j, loc, start, end = museumRequest(location, startYear, endYear)
-    print(j.json()['total'])
+    print('Total artifacts: ' + str(j.json()['total']))
     df = convertToDataFrame(cols)
     obj_df = getObjInfo(j.json(), df)
-    table_name = location
+    table_name = loc
     createDB(database_name)
-    convertToSQL(table_name, df, database_name)
+    convertToSQL(table_name, obj_df, database_name)
     saveSQLtoFile(database_name, file_name)
-    displayGraph(loc, start, end)
+    displayGraph(loc, start, end, obj_df)
 
 
 if __name__ == "__main__":
